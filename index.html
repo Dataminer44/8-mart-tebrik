@@ -256,6 +256,32 @@
     body { align-items: flex-start; padding: 10px; }
     .flower-wrap { margin-bottom: 8px; }
   }
+
+  .counter-wrap {
+    margin-top: 16px;
+    animation: fadeUp 1s 1.3s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .counter-badge {
+    font-size: clamp(9px, 2.5vw, 11px);
+    letter-spacing: 2px;
+    color: rgba(232,83,106,0.5);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+  }
+
+  .author-credit {
+    margin-top: 10px;
+    font-size: clamp(9px, 2.2vw, 10px);
+    letter-spacing: 1.5px;
+    color: rgba(201,169,110,0.22);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    animation: fadeUp 1s 1.4s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .author-credit span {
+    color: rgba(201,169,110,0.35);
+    font-style: italic;
+  }
 </style>
 </head>
 <body>
@@ -319,6 +345,11 @@
   </div>
 
   <p class="footer-text">Sevgi · Güc · Zərafət</p>
+
+  <div class="counter-wrap" id="counterWrap">
+    <span class="counter-badge" id="hitCounter">🌸 yüklənir...</span>
+  </div>
+  <div class="author-credit">tərəfindən hazırlandı &mdash; <span>Emil Abbasov</span></div>
 </div>
 
 <script>
@@ -349,6 +380,39 @@
   const st = document.createElement('style');
   st.textContent = `@keyframes sparkOut { 0%{opacity:1;transform:scale(1) translateY(0)} 100%{opacity:0;transform:scale(0) translateY(-22px)} }`;
   document.head.appendChild(st);
+
 </script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCBXUOQIUPDs7wc1w84ajKd-Y6epxX1byI",
+    authDomain: "mart-counter.firebaseapp.com",
+    databaseURL: "https://mart-counter-default-rtdb.firebaseio.com",
+    projectId: "mart-counter",
+    storageBucket: "mart-counter.firebasestorage.app",
+    messagingSenderId: "34261448588",
+    appId: "1:34261448588:web:01ea14e498e5795b0188a9"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const counterRef = ref(db, 'visits');
+
+  // Increment on each visit
+  runTransaction(counterRef, (current) => {
+    return (current || 0) + 1;
+  });
+
+  // Show live count
+  onValue(counterRef, (snapshot) => {
+    const count = snapshot.val() || 0;
+    const el = document.getElementById('hitCounter');
+    if (el) el.textContent = '🌸 ' + count + ' nəfər baxıb';
+  });
+</script>
+
 </body>
 </html>
